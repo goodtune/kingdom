@@ -523,7 +523,14 @@ body {
 .winner-crown {
   font-size: 3rem;
   animation: crownFloat 2s ease-in-out infinite;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
+}
+
+.winner-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
 }
 
 @keyframes winnerPop {

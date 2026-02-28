@@ -46,6 +46,8 @@
     winnerName: document.getElementById("winner-name"),
     winnerFact: document.getElementById("winner-fact"),
     btnPlayAgain: document.getElementById("btn-play-again"),
+    btnWinnerHistory: document.getElementById("btn-winner-history"),
+    btnWinnerHome: document.getElementById("btn-winner-home"),
     btnHistory: document.getElementById("btn-history"),
     historyList: document.getElementById("history-list"),
     historyEmpty: document.getElementById("history-empty"),
@@ -934,6 +936,8 @@
     );
 
     els.btnPlayAgain.addEventListener("click", startNewGame);
+    els.btnWinnerHistory.addEventListener("click", showHistory);
+    els.btnWinnerHome.addEventListener("click", () => showScreen("welcome"));
 
     els.btnHistory.addEventListener("click", showHistory);
     els.btnHistoryBack.addEventListener("click", () => showScreen("welcome"));
