@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Animal Kingdom - Pick Your Favorite!</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x1F981;</text></svg>">
+</head>
+<body>
+  <!-- Welcome Screen -->
+  <div id="screen-welcome" class="screen active">
+    <div class="welcome-container">
+      <h1 class="welcome-title">
+        <span class="bounce-emoji">&#x1F981;</span>
+        Animal Kingdom
+        <span class="bounce-emoji delay">&#x1F418;</span>
+      </h1>
+      <p class="welcome-subtitle">Find your favorite animal!</p>
+      <div class="welcome-animals">
+        &#x1F436; &#x1F431; &#x1F427; &#x1F98B; &#x1F42C; &#x1F98A; &#x1F43B; &#x1F992;
+      </div>
+      <button id="btn-start" class="btn-big">Let's Go! &#x1F389;</button>
+      <button id="btn-continue" class="btn-big btn-secondary" style="display:none;">Continue Game &#x27A1;&#xFE0F;</button>
+      <button id="btn-reset" class="btn-small" style="display:none;">Start Over</button>
+    </div>
+  </div>
+
+  <!-- Selection Screen (Swipe Phase) -->
+  <div id="screen-selection" class="screen">
+    <div class="selection-header">
+      <div class="progress-info">
+        <span id="liked-count">0</span> / <span id="liked-target">10</span> liked
+      </div>
+      <div class="round-info">Round <span id="round-number">1</span></div>
+    </div>
+
+    <div class="card-area">
+      <div id="swipe-hint-left" class="swipe-hint left">&#x1F44E; Nah</div>
+      <div id="swipe-hint-right" class="swipe-hint right">&#x1F44D; Love it!</div>
+
+      <div id="animal-card" class="animal-card">
+        <div class="card-emoji" id="card-emoji">&#x1F981;</div>
+        <div class="card-name" id="card-name">Lion</div>
+        <div class="card-fact" id="card-fact">Lions are the only cats that live in groups!</div>
+        <div class="card-category" id="card-category">Big Animals</div>
+      </div>
+    </div>
+
+    <div class="swipe-instructions">
+      <span class="instruction-arrow">&#x2B05;&#xFE0F; Swipe or press left to skip</span>
+      <span class="instruction-arrow">Swipe or press right to like &#x27A1;&#xFE0F;</span>
+    </div>
+  </div>
+
+  <!-- Ranking Screen -->
+  <div id="screen-ranking" class="screen">
+    <div class="ranking-header">
+      <h2>&#x1F3C6; Rank Your Favorites!</h2>
+      <p class="ranking-subtitle">Drag to reorder — #1 is your top pick!</p>
+    </div>
+    <div id="ranking-list" class="ranking-list"></div>
+    <button id="btn-confirm-ranking" class="btn-big">Done! &#x2705;</button>
+  </div>
+
+  <!-- Bracket Screen -->
+  <div id="screen-bracket" class="screen">
+    <div class="bracket-header">
+      <h2 id="bracket-title">&#x1F3C6; Championship!</h2>
+      <p id="bracket-subtitle" class="bracket-round-info">Pick your favorite!</p>
+    </div>
+    <div class="bracket-matchup">
+      <button id="bracket-left" class="bracket-choice">
+        <div class="bracket-emoji">&#x1F981;</div>
+        <div class="bracket-name">Lion</div>
+      </button>
+      <div class="bracket-vs">VS</div>
+      <button id="bracket-right" class="bracket-choice">
+        <div class="bracket-emoji">&#x1F418;</div>
+        <div class="bracket-name">Elephant</div>
+      </button>
+    </div>
+    <div id="bracket-progress" class="bracket-progress"></div>
+  </div>
+
+  <!-- Winner Screen -->
+  <div id="screen-winner" class="screen">
+    <div class="winner-container">
+      <div class="confetti-area" id="confetti-area"></div>
+      <h2 class="winner-heading">&#x1F389; Your Favorite Animal! &#x1F389;</h2>
+      <div id="winner-emoji" class="winner-emoji">&#x1F981;</div>
+      <div id="winner-name" class="winner-name">Lion</div>
+      <div id="winner-fact" class="winner-fact">Lions are the only cats that live in groups!</div>
+      <div class="winner-crown">&#x1F451;</div>
+      <button id="btn-play-again" class="btn-big">Play Again! &#x1F504;</button>
+    </div>
+  </div>
+
+  <script src="animals.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
