@@ -6,7 +6,7 @@
   "use strict";
 
   // --- Constants ---
-  const LIKES_PER_ROUND = 10;
+  const LIKES_PER_ROUND = 8;
   const STORAGE_KEY = "animal-kingdom-state";
   const HISTORY_KEY = "animal-kingdom-history";
   const SWIPE_THRESHOLD = 80; // px to trigger swipe
