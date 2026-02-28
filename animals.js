@@ -58,7 +58,7 @@ const ANIMALS = [
   { id: 45, name: "Octopus", emoji: "\u{1F419}", category: "sea", fact: "Octopuses have three hearts and blue blood!", tags: ["sea", "water", "smart"] },
   { id: 46, name: "Fish", emoji: "\u{1F41F}", category: "sea", fact: "Fish can feel things with their whole body!", tags: ["sea", "water", "small"] },
   { id: 47, name: "Blowfish", emoji: "\u{1F421}", category: "sea", fact: "Pufferfish can puff up to twice their size when scared!", tags: ["sea", "water", "small", "spiky"] },
-  { id: 48, name: "Seahorse", emoji: "\u{1F9AB}", category: "sea", fact: "Seahorse dads are the ones who carry the babies!", tags: ["sea", "water", "small", "unique"] },
+  { id: 48, name: "Seal", emoji: "\u{1F9AD}", category: "sea", fact: "Seals can sleep underwater and come up to breathe without waking!", tags: ["sea", "water", "playful"] },
   { id: 49, name: "Crab", emoji: "\u{1F980}", category: "sea", fact: "Crabs can walk in all directions, but mostly walk sideways!", tags: ["sea", "water", "small", "shell"] },
   { id: 50, name: "Lobster", emoji: "\u{1F99E}", category: "sea", fact: "Lobsters taste food with their feet!", tags: ["sea", "water", "shell"] },
 

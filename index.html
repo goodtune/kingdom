@@ -22,6 +22,7 @@
       </div>
       <button id="btn-start" class="btn-big">Let's Go! &#x1F389;</button>
       <button id="btn-continue" class="btn-big btn-secondary" style="display:none;">Continue Game &#x27A1;&#xFE0F;</button>
+      <button id="btn-history" class="btn-big btn-history" style="display:none;">&#x1F3C5; Hall of Fame</button>
       <button id="btn-reset" class="btn-small" style="display:none;">Start Over</button>
     </div>
   </div>
@@ -94,6 +95,19 @@
       <div class="winner-crown">&#x1F451;</div>
       <button id="btn-play-again" class="btn-big">Play Again! &#x1F504;</button>
     </div>
+  </div>
+
+  <!-- History Screen -->
+  <div id="screen-history" class="screen">
+    <div class="history-header">
+      <h2>&#x1F3C5; Hall of Fame</h2>
+      <p class="history-subtitle">Your past champions!</p>
+    </div>
+    <div id="history-list" class="history-list"></div>
+    <div id="history-empty" class="history-empty" style="display:none;">
+      No battles yet — go play!
+    </div>
+    <button id="btn-history-back" class="btn-big">&#x2B05;&#xFE0F; Back</button>
   </div>
 
   <script src="animals.js"></script>

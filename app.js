@@ -8,6 +8,7 @@
   // --- Constants ---
   const LIKES_PER_ROUND = 10;
   const STORAGE_KEY = "animal-kingdom-state";
+  const HISTORY_KEY = "animal-kingdom-history";
   const SWIPE_THRESHOLD = 80; // px to trigger swipe
 
   // --- DOM Elements ---
@@ -17,6 +18,7 @@
     ranking: document.getElementById("screen-ranking"),
     bracket: document.getElementById("screen-bracket"),
     winner: document.getElementById("screen-winner"),
+    history: document.getElementById("screen-history"),
   };
 
   const els = {
@@ -44,6 +46,10 @@
     winnerName: document.getElementById("winner-name"),
     winnerFact: document.getElementById("winner-fact"),
     btnPlayAgain: document.getElementById("btn-play-again"),
+    btnHistory: document.getElementById("btn-history"),
+    historyList: document.getElementById("history-list"),
+    historyEmpty: document.getElementById("history-empty"),
+    btnHistoryBack: document.getElementById("btn-history-back"),
   };
 
   // --- Game State ---
@@ -58,6 +64,8 @@
     bracketRound: 0,
     bracketMatchIndex: 0,
     bracketWinners: [],
+    bracketSemiLosers: [],   // losers from semi-final round (bronze)
+    bracketFinalLoser: null, // loser from the final (silver)
     seenAnimalIds: [],       // track which animals have been shown
     preferences: {},         // tag -> score for preference tracking
     winner: null,
@@ -77,8 +85,11 @@
   function showScreen(name) {
     Object.values(screens).forEach((s) => s.classList.remove("active"));
     screens[name].classList.add("active");
-    state.phase = name;
-    saveState();
+    // Don't save history or welcome as the game phase
+    if (name !== "history") {
+      state.phase = name;
+      saveState();
+    }
   }
 
   // --- Preference Tracking ---
@@ -507,6 +518,8 @@
     state.bracketRound = 0;
     state.bracketMatchIndex = 0;
     state.bracketWinners = [];
+    state.bracketSemiLosers = [];
+    state.bracketFinalLoser = null;
 
     showScreen("bracket");
     showBracketMatch();
@@ -559,12 +572,24 @@
 
   function handleBracketChoice(side) {
     const matchIndex = state.bracketMatchIndex;
-    const winner =
-      side === "left"
-        ? state.bracketAnimals[matchIndex * 2]
-        : state.bracketAnimals[matchIndex * 2 + 1];
+    const leftAnimal = state.bracketAnimals[matchIndex * 2];
+    const rightAnimal = state.bracketAnimals[matchIndex * 2 + 1];
+    const winner = side === "left" ? leftAnimal : rightAnimal;
+    const loser = side === "left" ? rightAnimal : leftAnimal;
 
     state.bracketWinners.push(winner);
+
+    // Track losers at semi-final stage (4 animals left = semi-finals)
+    if (state.bracketAnimals.length === 4) {
+      if (!state.bracketSemiLosers) state.bracketSemiLosers = [];
+      state.bracketSemiLosers.push(loser);
+    }
+
+    // Track the final loser (2 animals left = final)
+    if (state.bracketAnimals.length === 2) {
+      state.bracketFinalLoser = loser;
+    }
+
     state.bracketMatchIndex++;
 
     const totalMatches = Math.floor(state.bracketAnimals.length / 2);
@@ -598,6 +623,10 @@
 
     showScreen("winner");
     spawnConfetti();
+
+    // Save to history and ensure the button is visible for next welcome screen
+    saveHistory(animal, state.bracketFinalLoser, state.bracketSemiLosers);
+    els.btnHistory.style.display = "";
     saveState();
   }
 
@@ -651,6 +680,8 @@
         bracketRound: state.bracketRound,
         bracketMatchIndex: state.bracketMatchIndex,
         bracketWinners: state.bracketWinners.map((a) => a.id),
+        bracketSemiLosers: (state.bracketSemiLosers || []).map((a) => a.id),
+        bracketFinalLoser: state.bracketFinalLoser ? state.bracketFinalLoser.id : null,
         seenAnimalIds: state.seenAnimalIds,
         preferences: state.preferences,
         winner: state.winner ? state.winner.id : null,
@@ -688,6 +719,8 @@
       state.bracketRound = saved.bracketRound || 0;
       state.bracketMatchIndex = saved.bracketMatchIndex || 0;
       state.bracketWinners = findAnimals(saved.bracketWinners || []);
+      state.bracketSemiLosers = findAnimals(saved.bracketSemiLosers || []);
+      state.bracketFinalLoser = saved.bracketFinalLoser ? findAnimal(saved.bracketFinalLoser) : null;
       state.seenAnimalIds = saved.seenAnimalIds || [];
       state.preferences = saved.preferences || {};
       state.winner = saved.winner ? findAnimal(saved.winner) : null;
@@ -710,6 +743,8 @@
       bracketRound: 0,
       bracketMatchIndex: 0,
       bracketWinners: [],
+      bracketSemiLosers: [],
+      bracketFinalLoser: null,
       seenAnimalIds: [],
       preferences: {},
       winner: null,
@@ -719,6 +754,110 @@
     } catch (e) {
       // ignore
     }
+  }
+
+  // --- History ---
+
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveHistory(gold, silver, bronzeArray) {
+    try {
+      const history = loadHistory();
+
+      // Prevent duplicate saves for the same game
+      const lastEntry = history[0];
+      if (lastEntry && lastEntry.gold.id === gold.id &&
+          Date.now() - lastEntry.timestamp < 5000) {
+        return;
+      }
+
+      const entry = {
+        timestamp: Date.now(),
+        gold: { id: gold.id, name: gold.name, emoji: gold.emoji },
+        silver: silver
+          ? { id: silver.id, name: silver.name, emoji: silver.emoji }
+          : null,
+        bronze: (bronzeArray || []).map((a) => ({
+          id: a.id,
+          name: a.name,
+          emoji: a.emoji,
+        })),
+      };
+
+      history.unshift(entry);
+
+      // Keep last 50 games
+      if (history.length > 50) history.length = 50;
+
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  function showHistory() {
+    const history = loadHistory();
+
+    if (history.length === 0) {
+      els.historyList.style.display = "none";
+      els.historyEmpty.style.display = "";
+    } else {
+      els.historyList.style.display = "";
+      els.historyEmpty.style.display = "none";
+
+      els.historyList.innerHTML = "";
+      history.forEach((entry) => {
+        const card = document.createElement("div");
+        card.className = "history-game";
+
+        const date = new Date(entry.timestamp);
+        const dateStr = date.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+
+        let rows = "";
+
+        // Gold
+        rows += buildMedalRow("\u{1F947}", entry.gold);
+
+        // Silver
+        if (entry.silver) {
+          rows += buildMedalRow("\u{1F948}", entry.silver);
+        }
+
+        // Bronze (could be 1-2 animals)
+        if (entry.bronze && entry.bronze.length > 0) {
+          entry.bronze.forEach((b) => {
+            rows += buildMedalRow("\u{1F949}", b);
+          });
+        }
+
+        card.innerHTML =
+          '<div class="history-game-date">' + dateStr + "</div>" + rows;
+        els.historyList.appendChild(card);
+      });
+    }
+
+    showScreen("history");
+  }
+
+  function buildMedalRow(medal, animal) {
+    return (
+      '<div class="history-medal-row">' +
+      '<span class="history-medal">' + medal + "</span>" +
+      '<span class="history-animal-emoji">' + animal.emoji + "</span>" +
+      '<span class="history-animal-name">' + animal.name + "</span>" +
+      "</div>"
+    );
   }
 
   // --- Game Flow ---
@@ -770,6 +909,12 @@
       els.btnReset.style.display = "";
     }
 
+    // Show history button if there are past games
+    const history = loadHistory();
+    if (history.length > 0) {
+      els.btnHistory.style.display = "";
+    }
+
     // Event listeners
     els.btnStart.addEventListener("click", startNewGame);
     els.btnContinue.addEventListener("click", resumeGame);
@@ -789,6 +934,9 @@
     );
 
     els.btnPlayAgain.addEventListener("click", startNewGame);
+
+    els.btnHistory.addEventListener("click", showHistory);
+    els.btnHistoryBack.addEventListener("click", () => showScreen("welcome"));
 
     // Swipe handling on card
     els.card.addEventListener("pointerdown", onPointerDown);
