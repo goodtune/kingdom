@@ -5,6 +5,31 @@
 (function () {
   "use strict";
 
+  // --- Helpers ---
+
+  // Sets an element to display either an animal image or emoji.
+  // For image: clears text, sets a background-image via inline style.
+  // For emoji: clears background-image, sets textContent.
+  function setAnimalDisplay(el, animal) {
+    if (animal.image) {
+      el.textContent = "";
+      el.style.backgroundImage = "url('" + animal.image + "')";
+      el.classList.add("has-animal-image");
+    } else {
+      el.style.backgroundImage = "";
+      el.textContent = animal.emoji;
+      el.classList.remove("has-animal-image");
+    }
+  }
+
+  // Builds the animal display HTML string for use in innerHTML contexts.
+  function animalDisplayHTML(animal, className) {
+    if (animal.image) {
+      return '<span class="' + className + ' has-animal-image" style="background-image:url(\'' + animal.image + '\')"></span>';
+    }
+    return '<span class="' + className + '">' + animal.emoji + '</span>';
+  }
+
   // --- Constants ---
   const LIKES_PER_ROUND = 8;
   const STORAGE_KEY = "animal-kingdom-state";
@@ -179,7 +204,7 @@
 
     const cat = CATEGORIES[animal.category] || CATEGORIES.other;
 
-    els.cardEmoji.textContent = animal.emoji;
+    setAnimalDisplay(els.cardEmoji, animal);
     els.cardName.textContent = animal.name;
     els.cardFact.textContent = animal.fact;
     els.cardCategory.textContent = cat.name;
@@ -322,7 +347,7 @@
 
       item.innerHTML = `
         <span class="ranking-number">${index + 1}</span>
-        <span class="ranking-emoji">${animal.emoji}</span>
+        ${animalDisplayHTML(animal, "ranking-emoji")}
         <span class="ranking-name">${animal.name}</span>
         <span class="ranking-handle">\u2630</span>
       `;
@@ -551,13 +576,11 @@
     const leftAnimal = animals[matchIndex * 2];
     const rightAnimal = animals[matchIndex * 2 + 1];
 
-    els.bracketLeft.querySelector(".bracket-emoji").textContent =
-      leftAnimal.emoji;
+    setAnimalDisplay(els.bracketLeft.querySelector(".bracket-emoji"), leftAnimal);
     els.bracketLeft.querySelector(".bracket-name").textContent =
       leftAnimal.name;
 
-    els.bracketRight.querySelector(".bracket-emoji").textContent =
-      rightAnimal.emoji;
+    setAnimalDisplay(els.bracketRight.querySelector(".bracket-emoji"), rightAnimal);
     els.bracketRight.querySelector(".bracket-name").textContent =
       rightAnimal.name;
 
@@ -619,7 +642,7 @@
 
   function showWinner() {
     const animal = state.winner;
-    els.winnerEmoji.textContent = animal.emoji;
+    setAnimalDisplay(els.winnerEmoji, animal);
     els.winnerName.textContent = animal.name;
     els.winnerFact.textContent = animal.fact;
 
@@ -782,14 +805,15 @@
 
       const entry = {
         timestamp: Date.now(),
-        gold: { id: gold.id, name: gold.name, emoji: gold.emoji },
+        gold: { id: gold.id, name: gold.name, emoji: gold.emoji, image: gold.image },
         silver: silver
-          ? { id: silver.id, name: silver.name, emoji: silver.emoji }
+          ? { id: silver.id, name: silver.name, emoji: silver.emoji, image: silver.image }
           : null,
         bronze: (bronzeArray || []).map((a) => ({
           id: a.id,
           name: a.name,
           emoji: a.emoji,
+          image: a.image,
         })),
       };
 
@@ -856,7 +880,7 @@
     return (
       '<div class="history-medal-row">' +
       '<span class="history-medal">' + medal + "</span>" +
-      '<span class="history-animal-emoji">' + animal.emoji + "</span>" +
+      animalDisplayHTML(animal, "history-animal-emoji") +
       '<span class="history-animal-name">' + animal.name + "</span>" +
       "</div>"
     );
